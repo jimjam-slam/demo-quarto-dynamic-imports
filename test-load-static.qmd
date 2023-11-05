@@ -1,0 +1,52 @@
+---
+title: "Load before showing..."
+---
+
+In this test, we'll wait on something loading before showing anything. But we want to find a way to show a message conditionally before that! If you turn on throttling in the browser and hard reload, you'll see that nothing is shown in place of the plot before Arquero is loaded, even though we immediately yield `undefined`.
+
+```{ojs}
+//| label: import-and-filter
+
+import {aq, op} from "https://esm.run/arquero"
+
+data = aq.loadCSV("penguins.csv")
+
+viewof selectedIsland = Inputs.select(
+  ["Torgersen", "Biscoe", "Dream", "This place doesn't exist"], {
+    value: "Torgersen"
+  })
+```
+
+```{ojs}
+//| label: filter
+
+filteredData = {
+  yield undefined
+
+  yield data
+    .params({ selectedIsland: selectedIsland })
+    .filter(d => d.island == selectedIsland)
+    .objects()
+}
+
+filteredData
+```
+
+Now we'll _conditionally_ show the plot. If there's no data displayed, we'll show a message instead:
+
+```{ojs}
+//| label: plot
+
+filteredData === undefined ?
+  md`Wait a few seconds...` :
+  filteredData.length == 0 ?
+    md`No data available for the group **${selectedIsland}**` :
+    Plot.plot({
+      marks: [
+        Plot.dot(filteredData, {
+          x: "bill_length_mm",
+          y: "bill_depth_mm"
+        })
+      ]
+    })
+```

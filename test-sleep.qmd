@@ -1,0 +1,47 @@
+---
+title: "Sleep before showing..."
+---
+
+In this test, we'll wait a few seconds before showing anything.
+
+```{ojs}
+//| label: import-and-filter
+
+data = FileAttachment("penguins.csv").csv({ typed: true })
+
+viewof selectedIsland = Inputs.select(
+  ["Torgersen", "Biscoe", "Dream", "This place doesn't exist"], {
+    value: "Torgersen"
+  })
+
+filteredData = {
+  yield undefined
+
+  await Promises.delay(5000, "")
+
+  while(true) {
+    yield data.filter(d => d.island == selectedIsland)
+  }
+}
+
+filteredData
+```
+
+Now we'll _conditionally_ show the plot: if there's no data displayed, we'll show a message instead:
+
+```{ojs}
+//| label: plot
+
+filteredData === undefined ?
+  md`Wait a few seconds...` :
+  filteredData.length == 0 ?
+    md`No data available for the group **${selectedIsland}**` :
+    Plot.plot({
+      marks: [
+        Plot.dot(filteredData, {
+          x: "bill_length_mm",
+          y: "bill_depth_mm"
+        })
+      ]
+    })
+```

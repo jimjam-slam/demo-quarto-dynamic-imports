@@ -1,0 +1,58 @@
+---
+title: "Load before showing..."
+---
+
+In this test, we'll wait on something loading before showing anything. But we want to find a way to show a message conditionally before that!
+
+If you turn on throttling in the browser and hard reload, you'll see that nothing initially appears in place of the plot, then "Wait until the library loads..." is shown in place of the plot, then the plot itself loads.
+
+### Oustanding questions
+
+Do I need to dynamic import everything in every cell in which it's used?
+
+```{ojs}
+//| label: import-and-filter
+
+data = FileAttachment("penguins.csv").csv({ typed: true })
+
+viewof selectedIsland = Inputs.select(
+  ["Torgersen", "Biscoe", "Dream", "This place doesn't exist"], {
+    value: "Torgersen"
+  })
+```
+
+```{ojs}
+//| label: filter
+
+filteredData = {
+  yield undefined
+
+  await import("https://cdn.jsdelivr.net/npm/arquero@5/dist/arquero.min.js")
+
+  yield aq.from(data)
+    .params({ selectedIsland: selectedIsland })
+    .filter(d => d.island == selectedIsland)
+    .objects()
+}
+
+filteredData
+```
+
+Now we'll _conditionally_ show the plot. If there's no data displayed, we'll show a message instead:
+
+```{ojs}
+//| label: plot
+
+filteredData === undefined ?
+  md`Wait until the library loads...` :
+  filteredData.length == 0 ?
+    md`No data available for the group **${selectedIsland}**` :
+    Plot.plot({
+      marks: [
+        Plot.dot(filteredData, {
+          x: "bill_length_mm",
+          y: "bill_depth_mm"
+        })
+      ]
+    })
+```

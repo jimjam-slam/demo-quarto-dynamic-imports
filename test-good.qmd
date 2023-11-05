@@ -1,0 +1,37 @@
+---
+title: "Successful conditional test"
+---
+
+Let's filter some data on a dropdown menu:
+
+```{ojs}
+//| label: import-and-filter
+
+data = FileAttachment("penguins.csv").csv({ typed: true })
+
+viewof selectedIsland = Inputs.select(
+  ["Torgersen", "Biscoe", "Dream", "This place doesn't exist"], {
+    value: "Torgersen"
+  })
+
+filteredData = data.filter(d => d.island == selectedIsland)
+
+filteredData
+```
+
+Now we'll _conditionally_ show the plot: if there's no data displayed, we'll show a message instead:
+
+```{ojs}
+//| label: plot
+
+filteredData.length == 0 ?
+  md`No data available for the group **${selectedIsland}**` :
+  Plot.plot({
+    marks: [
+      Plot.dot(filteredData, {
+        x: "bill_length_mm",
+        y: "bill_depth_mm"
+      })
+    ]
+  }) 
+```
