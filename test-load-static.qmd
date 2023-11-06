@@ -7,7 +7,7 @@ In this test, we'll wait on something loading before showing anything. But we wa
 ```{ojs}
 //| label: import-and-filter
 
-import {aq, op} from "https://esm.run/arquero"
+import {aq, op} from "@uwdata/arquero"
 
 data = aq.loadCSV("penguins.csv")
 
@@ -25,6 +25,7 @@ filteredData = {
 
   yield data
     .params({ selectedIsland: selectedIsland })
+    .derive({ date: d => op.datetime(d.year) })
     .filter(d => d.island == selectedIsland)
     .objects()
 }
