@@ -6,10 +6,6 @@ In this test, we'll wait on something loading before showing anything. But we wa
 
 If you turn on throttling in the browser and hard reload, you'll see that nothing initially appears in place of the plot, then "Wait until the library loads..." is shown in place of the plot, then the plot itself loads.
 
-### Oustanding questions
-
-Do I need to dynamic import everything in every cell in which it's used?
-
 ```{ojs}
 //| label: import-and-filter
 
